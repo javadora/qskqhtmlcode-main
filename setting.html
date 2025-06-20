@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>考勤系统 - 设置</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#165DFF',
+                        success: '#00B42A',
+                        warning: '#FF7D00',
+                        danger: '#F53F3F',
+                        info: '#86909C',
+                        light: '#F2F3F5',
+                        dark: '#1D2129',
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .scrollbar-hide {
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+            }
+            .scrollbar-hide::-webkit-scrollbar {
+                display: none;
+            }
+            .shadow-card {
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            }
+            .transition-custom {
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+            .form-focus {
+                @apply focus:ring-2 focus:ring-primary/50 focus:border-primary focus:outline-none;
+            }
+            .setting-active {
+                @apply border-l-4 border-primary bg-primary/5 text-primary font-medium;
+            }
+        }
+    </style>
+</head>
+<body class="font-inter bg-gray-50 text-dark min-h-screen flex flex-col">
+<!-- 顶部导航栏 -->
+<header class="bg-white shadow-sm sticky top-0 z-50">
+    <div class="container mx-auto px-4">
+        <div class="flex items-center justify-between h-16">
+            <!-- 左侧Logo和标题 -->
+            <div class="flex items-center space-x-2">
+                <div class="text-primary text-2xl">
+                    <i class="fa fa-calendar-check-o"></i>
+                </div>
+                <span class="font-bold text-xl">智慧考勤系统</span>
+            </div>
+
+            <!-- 中部导航菜单 -->
+            <nav class="hidden md:flex space-x-8">
+                <a href="#" class="text-gray-500 hover:text-primary px-1 py-2 border-b-2 border-transparent">首页</a>
+                <a href="#" class="text-gray-500 hover:text-primary px-1 py-2 border-b-2 border-transparent">排班管理</a>
+                <a href="#" class="text-gray-500 hover:text-primary px-1 py-2 border-b-2 border-transparent">考勤记录</a>
+                <a href="#" class="text-gray-500 hover:text-primary px-1 py-2 border-b-2 border-transparent">请假申请</a>
+                <a href="#" class="text-primary px-1 py-2 border-b-2 border-primary font-medium">系统设置</a>
+            </nav>
+
+            <!-- 右侧用户信息 -->
+            <div class="flex items-center space-x-4">
+                <button class="p-2 rounded-full hover:bg-gray-100 text-gray-500 relative">
+                    <i class="fa fa-bell-o"></i>
+                    <span class="absolute top-1 right-1 w-2 h-2 bg-danger rounded-full"></span>
+                </button>
+                <div class="flex items-center space-x-2">
+                    <img src="https://picsum.photos/id/64/200/200" alt="用户头像" class="w-8 h-8 rounded-full object-cover border-2 border-primary/20">
+                    <span class="hidden md:inline-block font-medium">管理员</span>
+                    <i class="fa fa-angle-down text-gray-500"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- 主内容区 -->
+<main class="flex-grow container mx-auto px-4 py-6">
+    <!-- 页面标题 -->
+    <div class="mb-6">
+        <h1 class="text-[clamp(1.5rem,3vw,2rem)] font-bold text-gray-800">系统设置</h1>
+        <p class="text-gray-500 mt-1">管理您的个人信息和系统偏好</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <!-- 左侧边栏 - 设置菜单 -->
+        <div class="lg:col-span-1">
+            <div class="bg-white rounded-xl shadow-card overflow-hidden">
+                <div class="p-5 border-b border-gray-100">
+                    <h2 class="text-lg font-semibold">设置菜单</h2>
+                </div>
+                <nav class="divide-y divide-gray-100">
+                    <a href="#account" class="flex items-center p-4 hover:bg-gray-50 transition-custom setting-active">
+                        <i class="fa fa-user-circle-o w-6 text-gray-500"></i>
+                        <span class="ml-3">账户设置</span>
+                    </a>
+                    <a href="#notification" class="flex items-center p-4 hover:bg-gray-50 transition-custom">
+                        <i class="fa fa-bell-o w-6 text-gray-500"></i>
+                        <span class="ml-3">通知设置</span>
+                    </a>
+                    <a href="#attendance" class="flex items-center p-4 hover:bg-gray-50 transition-custom">
+                        <i class="fa fa-calendar w-6 text-gray-500"></i>
+                        <span class="ml-3">考勤规则</span>
+                    </a>
+                    <a href="#security" class="flex items-center p-4 hover:bg-gray-50 transition-custom">
+                        <i class="fa fa-shield w-6 text-gray-500"></i>
+                        <span class="ml-3">安全设置</span>
+                    </a>
+                    <a href="#appearance" class="flex items-center p-4 hover:bg-gray-50 transition-custom">
+                        <i class="fa fa-paint-brush w-6 text-gray-500"></i>
+                        <span class="ml-3">外观设置</span>
+                    </a>
+                    <a href="#about" class="flex items-center p-4 hover:bg-gray-50 transition-custom">
+                        <i class="fa fa-info-circle w-6 text-gray-500"></i>
+                        <span class="ml-3">关于系统</span>
+                    </a>
+                </nav>
+            </div>
+        </div>
+
+        <!-- 右侧内容区 - 设置详情 -->
+        <div class="lg:col-span-3 space-y-6">
+            <!-- 账户设置卡片 -->
+            <div class="bg-white rounded-xl shadow-card p-6" id="account">
+                <h2 class="text-lg font-semibold mb-5">账户设置</h2>
+
+                <form id="accountForm">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <!-- 左侧表单 -->
+                        <div>
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">用户名</label>
+                                <input type="text" value="王小明" class="w-full px-3 py-2 text-base border-gray-300 rounded-lg form-focus">
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">员工编号</label>
+                                <input type="text" value="EMP001" class="w-full px-3 py-2 text-base border-gray-300 rounded-lg form-focus" readonly>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">部门</label>
+                                <div class="relative">
+                                    <select class="w-full pl-3 pr-10 py-2 text-base border-gray-300 rounded-lg form-focus appearance-none">
+                                        <option value="1">技术部</option>
+                                        <option value="2">市场部</option>
+                                        <option value="3">人力资源部</option>
+                                        <option value="4">财务部</option>
+                                        <option value="5">销售部</option>
+                                    </select>
+                                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500">
+                                        <i class="fa fa-chevron-down text-xs"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">职位</label>
+                                <input type="text" value="前端开发工程师" class="w-full px-3 py-2 text-base border-gray-300 rounded-lg form-focus">
+                            </div>
+                        </div>
+
+                        <!-- 右侧表单 -->
+                        <div>
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">手机号码</label>
+                                <input type="tel" value="13800138000" class="w-full px-3 py-2 text-base border-gray-300 rounded-lg form-focus">
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">电子邮箱</label>
+                                <input type="email" value="wangxiaoming@example.com" class="w-full px-3 py-2 text-base border-gray-300 rounded-lg form-focus">
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">入职日期</label>
+                                <input type="date" value="2023-05-15" class="w-full px-3 py-2 text-base border-gray-300 rounded-lg form-focus">
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">头像</label>
+                                <div class="flex items-center space-x-4">
+                                    <img src="https://picsum.photos/id/64/200/200" alt="用户头像" class="w-16 h-16 rounded-full object-cover border-2 border-primary/20">
+                                    <button type="button" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-custom">
+                                        更换头像
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end space-x-3 mt-6">
+                        <button type="button" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-custom">
+                            取消
+                        </button>
+                        <button type="submit" class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-custom">
+                            保存更改
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- 通知设置卡片 -->
+            <div class="bg-white rounded-xl shadow-card p-6" id="notification">
+                <h2 class="text-lg font-semibold mb-5">通知设置</h2>
+
+                <div class="space-y-5">
+                    <div class="p-4 border border-gray-200 rounded-lg hover:border-primary/30 transition-custom">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <div class="text-primary text-xl mr-3">
+                                    <i class="fa fa-bell-o"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-medium">系统通知</h3>
+                                    <p class="text-sm text-gray-500">接收系统发送的重要通知</p>
+                                </div>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" checked class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="p-4 border border-gray-200 rounded-lg hover:border-primary/30 transition-custom">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <div class="text-success text-xl mr-3">
+                                    <i class="fa fa-check-circle-o"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-medium">审批结果通知</h3>
+                                    <p class="text-sm text-gray-500">接收请假、加班等审批结果</p>
+                                </div>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" checked class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="p-4 border border-gray-200 rounded-lg hover:border-primary/30 transition-custom">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <div class="text-warning text-xl mr-3">
+                                    <i class="fa fa-clock-o"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-medium">考勤提醒</h3>
+                                    <p class="text-sm text-gray-500">接收打卡提醒和异常考勤通知</p>
+                                </div>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" checked class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="p-4 border border-gray-200 rounded-lg hover:border-primary/30 transition-custom">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <div class="text-info text-xl mr-3">
+                                    <i class="fa fa-calendar-plus-o"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-medium">排班通知</h3>
+                                    <p class="text-sm text-gray-500">接收排班变更和节假日通知</p>
+                                </div>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" checked class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6">
+                    <h3 class="font-medium mb-3">通知方式</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="p-4 border border-gray-200 rounded-lg text-center hover:border-primary/30 transition-custom">
+                            <div class="text-xl mb-2">
+                                <i class="fa fa-mobile text-primary"></i>
+                            </div>
+                            <h4 class="font-medium">短信通知</h4>
+                            <p class="text-sm text-gray-500 mt-1">138****8000</p>
+                            <label class="relative inline-flex items-center cursor-pointer mt-3">
+                                <input type="checkbox" checked class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                            </label>
+                        </div>
+
+                        <div class="p-4 border border-gray-200 rounded-lg text-center hover:border-primary/30 transition-custom">
+                            <div class="text-xl mb-2">
+                                <i class="fa fa-envelope-o text-primary"></i>
+                            </div>
+                            <h4 class="font-medium">邮件通知</h4>
+                            <p class="text-sm text-gray-500 mt-1">wangxiaoming@example.com</p>
+                            <label class="relative inline-flex items-center cursor-pointer mt-3">
+                                <input type="checkbox" checked class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                            </label>
+                        </div>
+
+                        <div class="p-4 border border-gray-200 rounded-lg text-center hover:border-primary/30 transition-custom">
+                            <div class="text-xl mb-2">
+                                <i class="fa fa-bell-o text-primary"></i>
+                            </div>
+                            <h4 class="font-medium">应用内通知</h4>
+                            <p class="text-sm text-gray-500 mt-1">系统内消息通知</p>
+                            <label class="relative inline-flex items-center cursor-pointer mt-3">
+                                <input type="checkbox" checked class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 考勤规则设置卡片 -->
+            <div class="bg-white rounded-xl shadow-card p-6" id="attendance">
+                <h2 class="text-lg font-semibold mb-5">考勤规则</h2>
+
+                <div class="space-y-5">
+                    <div class="p-4 border border-gray-200 rounded-lg">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-medium">工作日设置</h3>
+                            <button type="button" class="text-primary hover:text-primary/80 transition-custom">
+                                编辑
+                            </button>
+                        </div>
+
+                        <div class="grid grid-cols-7 gap-2 text-center">
+                            <div class="p-2 border border-gray-200 rounded-lg">
+                                <div class="text-sm font-medium">周一</div>
+                                <div class="text-xs text-gray-500">上班</div>
+                            </div>
+                            <div class="p-2 border border-gray-200 rounded-lg">
+                                <div class="text-sm font-medium">周二</div>
+                                <div class="text-xs text-gray-500">上班</div>
+                            </div>
+                            <div class="p-2 border border-gray-200 rounded-lg">
+                                <div class="text-sm font-medium">周三</div>
+                                <div class="text-xs text-gray-500">上班</div>
+                            </div>
+                            <div class="p-2 border border-gray-200 rounded-lg">
+                                <div class="text-sm font-medium">周四</div>
+                                <div class="text-xs text-gray-500">上班</div>
+                            </div>
+                            <div class="p-2 border border-gray-200 rounded-lg">
+                                <div class="text-sm font-medium">周五</div>
+                                <div class="text-xs text-gray-500">上班</div>
+                            </div>
+                            <div class="p-2 border border-gray-200 bg-gray-100 rounded-lg">
+                                <div class="text-sm font-medium">周六</div>
+                                <div class="text-xs text-gray-500">休息</div>
+                            </div>
+                            <div class="p-2 border border-gray-200 bg-gray-100 rounded-lg">
+                                <div class="text-sm font-medium">周日</div>
+                                <div class="text-xs text-gray-500">休息</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-4 border border-gray-200 rounded-lg">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-medium">打卡时间设置</h3>
+                            <button type="button" class="text-primary hover:text-primary/80 transition-custom">
+                                编辑
+                            </button>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <h4 class="font-medium text-sm mb-2">上午打卡时间</h4>
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <span class="text-gray-500">上班打卡:</span>
+                                        <span class="ml-2 font-medium">09:00</span>
+                                    </div>
+                                    <div class="text-danger">
+                                        <i class="fa fa-clock-o"></i>
+                                        <span class="ml-1">迟到时间: 15分钟</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between mt-2">
+                                    <div>
+                                        <span class="text-gray-500">下班打卡:</span>
+                                        <span class="ml-2 font-medium">12:00</span>
+                                    </div>
+                                    <div class="text-danger">
+                                        <i class="fa fa-clock-o"></i>
+                                        <span class="ml-1">早退时间: 15分钟</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <h4 class="font-medium text-sm mb-2">下午打卡时间</h4>
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <span class="text-gray-500">上班打卡:</span>
+                                        <span class="ml-2 font-medium">13:30</span>
+                                    </div>
+                                    <div class="text-danger">
+                                        <i class="fa fa-clock-o"></i>
+                                        <span class="ml-1">迟到时间: 15分钟</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between mt-2">
+                                    <div>
+                                        <span class="text-gray-500">下班打卡:</span>
+                                        <span class="ml-2 font-medium">18:30</span>
+                                    </div>
+                                    <div class="text-danger">
+                                        <i class="fa fa-clock-o"></i>
+                                        <span class="ml-1">早退时间: 15分钟</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-4 border border-gray-200 rounded-lg">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-medium">请假规则</h3>
+                            <button type="button" class="text-primary hover:text-primary/80 transition-custom">
+                                编辑
+                            </button>
+                        </div>
+
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <span class="font-medium">年假天数:</span>
+                                    <span class="ml-2 text-gray-700">15天/年</span>
+                                </div>
+                                <div>
+                                    <span class="font-medium">病假天数:</span>
+                                    <span class="ml-2 text-gray-700">20天/年</span>
+                                </div>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <span class="font-medium">事假限制:</span>
+                                    <span class="ml-2 text-gray-700">3天/月</span>
+                                </div>
+                                <div>
+                                    <span class="font-medium">婚假天数:</span>
+                                    <span class="ml-2 text-gray-700">10天</span>
+                                </div>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <span class="font-medium">产假天数:</span>
+                                    <span class="ml-2 text-gray-700">98天</span>
+                                </div>
+                                <div>
+                                    <span class="font-medium">陪产假天数:</span>
+                                    <span class="ml-2 text-gray-700">15天</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 安全设置卡片 -->
+            <div class="bg-white rounded-xl shadow-card p-6" id="security">
+                <h2 class="text-lg font-semibold mb-5">安全设置</h2>
+
+                <div class="space-y-5">
+                    <div class="p-4 border border-gray-200 rounded-lg">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <div class="text-primary text-xl mr-3">
+                                    <i class="fa fa-key"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-medium">修改密码</h3>
+                                    <p class="text-sm text-gray-500">设置新的登录密码</p>
+                                </div>
+                            </div>
+                            <button type="button" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-custom">
+                                修改
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="p-4 border border-gray-200 rounded-lg">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <div class="text-warning text-xl mr-3">
+                                    <i class="fa fa-mobile"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-medium">绑定手机</h3>
+                                    <p class="text-sm text-gray-500">已绑定: 138****8000</p>
+                                </div>
+                            </div>
+                            <button type="button" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-custom">
+                                更换
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="p-4 border border-gray-200 rounded-lg">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <div class="text-success text-xl mr-3">
+                                    <i class="fa fa-shield"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-medium">两步验证</h3>
+                                    <p class="text-sm text-gray-500">增强账户安全性</p>
+                                </div>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="p-4 border border-gray-200 rounded-lg">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <div class="text-danger text-xl mr-3">
+                                    <i class="fa fa-exclamation-triangle"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-medium">账户注销</h3>
+                                    <p class="text-sm text-gray-500">永久删除您的账户</p>
+                                </div>
+                            </div>
+                            <button type="button" class="px-4 py-2 text-danger border border-danger/30 rounded-lg hover:bg-danger/5 transition-custom">
+                                注销账户
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 外观设置卡片 -->
+            <div class="bg-white rounded-xl shadow-card p-6" id="appearance">
+                <h2 class="text-lg font-semibold mb-5">外观设置</h2>
+
+                <div class="space-y-5">
+                    <div class="p-4 border border-gray-200 rounded-lg">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-medium">主题模式</h3>
+                        </div>
+
+                        <div class="grid grid-cols-3 gap-4">
+                            <div class="p-3 border-2 border-primary bg-primary/5 rounded-lg cursor-pointer text-center">
+                                <div class="text-xl mb-2">
+                                    <i class="fa fa-sun-o text-primary"></i>
+                                </div>
+                                <h4 class="font-medium">浅色模式</h4>
+                            </div>
+
+                            <div class="p-3 border border-gray-200 rounded-lg cursor-pointer text-center hover:border-primary/30 transition-custom">
+                                <div class="text-xl mb-2">
+                                    <i class="fa fa-moon-o text-gray-500"></i>
+                                </div>
+                                <h4 class="font-medium">深色模式</h4>
+                            </div>
+
+                            <div class="p-3 border border-gray-200 rounded-lg cursor-pointer text-center hover:border-primary/30 transition-custom">
+                                <div class="text-xl mb-2">
+                                    <i class="fa fa-magic text-gray-500"></i>
+                                </div>
+                                <h4 class="font-medium">自动模式</h4>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-4 border border-gray-200 rounded-lg">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-medium">主题颜色</h3>
+                        </div>
+
+                        <div class="grid grid-cols-7 gap-3">
+                            <div class="w-10 h-10 rounded-full bg-blue-500 border-2 border-white shadow-md cursor-pointer"></div>
+                            <div class="w-10 h-10 rounded-full bg-red-500 border-2 border-white shadow-md cursor-pointer"></div>
+                            <div class="w-10 h-10 rounded-full bg-green-500 border-2 border-white shadow-md cursor-pointer"></div>
+                            <div class="w-10 h-10 rounded-full bg-yellow-500 border-2 border-white shadow-md cursor-pointer"></div>
+                            <div class="w-10 h-10 rounded-full bg-purple-500 border-2 border-white shadow-md cursor-pointer"></div>
+                            <div class="w-10 h-10 rounded-full bg-pink-500 border-2 border-white shadow-md cursor-pointer"></div>
+                            <div class="w-10 h-10 rounded-full bg-gray-500 border-2 border-white shadow-md cursor-pointer"></div>
+                        </div>
+                    </div>
+
+                    <div class="p-4 border border-gray-200 rounded-lg">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-medium">字体大小</h3>
+                        </div>
+
+                        <div class="flex items-center justify-between px-4">
+                            <button type="button" class="text-xl text-gray-500 hover:text-primary transition-custom">
+                                <i class="fa fa-font"></i>
+                            </button>
+                            <div class="w-full mx-4 h-2 bg-gray-200 rounded-full">
+                                <div class="w-1/2 h-2 bg-primary rounded-full"></div>
+                            </div>
+                            <button type="button" class="text-xl text-primary hover:text-primary/80 transition-custom">
+                                <i class="fa fa-font"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 关于系统卡片 -->
+            <div class="bg-white rounded-xl shadow-card p-6" id="about">
+                <h2 class="text-lg font-semibold mb-5">关于系统</h2>
+
+                <div class="space-y-5">
+                    <div class="p-4 border border-gray-200 rounded-lg">
+                        <div class="flex flex-col md:flex-row items-center">
+                            <div class="text-4xl text-primary mb-4 md:mb-0 md:mr-6">
+                                <i class="fa fa-calendar-check-o"></i>
+                            </div>
+                            <div class="text-center md:text-left">
+                                <h3 class="text-xl font-bold">智慧考勤系统</h3>
+                                <p class="text-gray-500 mt-1">版本: v2.3.1</p>
+                                <p class="text-gray-500 mt-1">© 2025 智慧考勤系统. 保留所有权利.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-4 border border-gray-200 rounded-lg">
+                        <h3 class="font-medium mb-3">系统信息</h3>
+                        <div class="space-y-2">
+                            <div class="flex justify-between">
+                                <span class="text-gray-500">服务器时间:</span>
+                                <span id="serverTime">2025-06-20 14:30:00</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-500">上次更新时间:</span>
+                                <span>2025-06-15</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-500">数据库版本:</span>
+                                <span>v1.8.0</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-500">API 版本:</span>
+                                <span>v2.0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-4 border border-gray-200 rounded-lg">
+                        <h3 class="font-medium mb-3">关于我们</h3>
+                        <p class="text-gray-700">智慧考勤系统是一款专为企业打造的高效考勤管理解决方案，提供请假申请、排班管理、考勤记录等全方位功能，帮助企业简化考勤流程，提高管理效率。</p>
+
+                        <div class="mt-4 flex space-x-4">
+                            <a href="#" class="text-primary hover:text-primary/80 transition-custom">
+                                <i class="fa fa-question-circle mr-1"></i> 帮助中心
+                            </a>
+                            <a href="#" class="text-primary hover:text-primary/80 transition-custom">
+                                <i class="fa fa-file-text-o mr-1"></i> 使用条款
+                            </a>
+                            <a href="#" class="text-primary hover:text-primary/80 transition-custom">
+                                <i class="fa fa-shield mr-1"></i> 隐私政策
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- 页脚 -->
+<footer class="bg-white border-t border-gray-200 mt-10">
+    <div class="container mx-auto px-4 py-6">
+        <div class="flex flex-col md:flex-row justify-between items-center">
+            <div class="text-center md:text-left mb-4 md:mb-0">
+                <p class="text-sm text-gray-500">© 2025 智慧考勤系统. 保留所有权利.</p>
+            </div>
+            <div class="flex space-x-6">
+                <a href="#" class="text-gray-500 hover:text-primary transition-custom">
+                    <i class="fa fa-question-circle"></i> 帮助中心
+                </a>
+                <a href="#" class="text-gray-500 hover:text-primary transition-custom">
+                    <i class="fa fa-file-text-o"></i> 使用条款
+                </a>
+                <a href="#" class="text-gray-500 hover:text-primary transition-custom">
+                    <i class="fa fa-shield"></i> 隐私政策
+                </a>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- 修改密码模态框 -->
+<div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden" id="changePasswordModal">
+    <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6 transform transition-all">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-medium text-gray-900">修改密码</h3>
+            <button class="text-gray-400 hover:text-gray-500" onclick="document.getElementById('changePasswordModal').classList.add('hidden')">
+                <i class="fa fa-times"></i>
+            </button>
+        </div>
+
+        <form id="changePasswordForm">
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-1">当前密码</label>
+                <input type="password" class="w-full px-3 py-2 text-base border-gray-300 rounded-lg form-focus">
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-1">新密码</label>
+                <input type="password" class="w-full px-3 py-2 text-base border-gray-300 rounded-lg form-focus">
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-1">确认新密码</label>
+                <input type="password" class="w-full px-3 py-2 text-base border-gray-300 rounded-lg form-focus">
+            </div>
+
+            <div class="flex justify-end space-x-3 mt-6">
+                <button type="button" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-custom" onclick="document.getElementById('changePasswordModal').classList.add('hidden')">
+                    取消
+                </button>
+                <button type="submit" class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-custom">
+                    保存更改
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // 设置当前日期和时间
+    document.addEventListener('DOMContentLoaded', function() {
+        // 设置服务器时间
+        function updateServerTime() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+
+            const serverTimeElement = document.getElementById('serverTime');
+            if (serverTimeElement) {
+                serverTimeElement.textContent = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+            }
+        }
+
+        // 初始更新服务器时间
+        updateServerTime();
+
+        // 每秒更新一次服务器时间
+        setInterval(updateServerTime, 1000);
+
+        // 设置菜单切换
+        const settingLinks = document.querySelectorAll('nav a');
+        settingLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+
+                // 移除所有活动状态
+                settingLinks.forEach(l => l.classList.remove('setting-active'));
+
+                // 添加当前活动状态
+                this.classList.add('setting-active');
+
+                // 获取目标ID
+                const targetId = this.getAttribute('href').substring(1);
+
+                // 滚动到目标部分
+                const targetElement = document.getElementById(targetId);
+                if (targetElement) {
+                    targetElement.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+
+        // 修改密码按钮
+        const changePasswordButton = document.querySelector('button:contains("修改密码")');
+        if (changePasswordButton) {
+            changePasswordButton.addEventListener('click', function() {
+                document.getElementById('changePasswordModal').classList.remove('hidden');
+            });
+        }
+
+        // 表单提交
+        document.getElementById('changePasswordForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            document.getElementById('changePasswordModal').classList.add('hidden');
+            // 显示成功提示
+            document.getElementById('notificationModal').classList.remove('hidden');
+        });
+    });
+</script>
+</body>
+</html>

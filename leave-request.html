@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>考勤系统 - 请假申请</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#165DFF',
+                        success: '#00B42A',
+                        warning: '#FF7D00',
+                        danger: '#F53F3F',
+                        info: '#86909C',
+                        light: '#F2F3F5',
+                        dark: '#1D2129',
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .scrollbar-hide {
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+            }
+            .scrollbar-hide::-webkit-scrollbar {
+                display: none;
+            }
+            .shadow-card {
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            }
+            .transition-custom {
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+            .form-focus {
+                @apply focus:ring-2 focus:ring-primary/50 focus:border-primary focus:outline-none;
+            }
+        }
+    </style>
+</head>
+<body class="font-inter bg-gray-50 text-dark min-h-screen flex flex-col">
+    <!-- 顶部导航栏 -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-between h-16">
+                <!-- 左侧Logo和标题 -->
+                <div class="flex items-center space-x-2">
+                    <div class="text-primary text-2xl">
+                        <i class="fa fa-calendar-check-o"></i>
+                    </div>
+                    <span class="font-bold text-xl">智慧考勤系统</span>
+                </div>
+                
+                <!-- 中部导航菜单 -->
+                <nav class="hidden md:flex space-x-8">
+                    <a href="#" class="text-gray-500 hover:text-primary px-1 py-2 border-b-2 border-transparent">首页</a>
+                    <a href="#" class="text-gray-500 hover:text-primary px-1 py-2 border-b-2 border-transparent">排班管理</a>
+                    <a href="#" class="text-gray-500 hover:text-primary px-1 py-2 border-b-2 border-transparent">考勤记录</a>
+                    <a href="#" class="text-primary px-1 py-2 border-b-2 border-primary font-medium">请假申请</a>
+                    <a href="#" class="text-gray-500 hover:text-primary px-1 py-2 border-b-2 border-transparent">系统设置</a>
+                </nav>
+                
+                <!-- 右侧用户信息 -->
+                <div class="flex items-center space-x-4">
+                    <button class="p-2 rounded-full hover:bg-gray-100 text-gray-500 relative">
+                        <i class="fa fa-bell-o"></i>
+                        <span class="absolute top-1 right-1 w-2 h-2 bg-danger rounded-full"></span>
+                    </button>
+                    <div class="flex items-center space-x-2">
+                        <img src="https://picsum.photos/id/64/200/200" alt="用户头像" class="w-8 h-8 rounded-full object-cover border-2 border-primary/20">
+                        <span class="hidden md:inline-block font-medium">管理员</span>
+                        <i class="fa fa-angle-down text-gray-500"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主内容区 -->
+    <main class="flex-grow container mx-auto px-4 py-6">
+        <!-- 页面标题和操作区 -->
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+            <div>
+                <h1 class="text-[clamp(1.5rem,3vw,2rem)] font-bold text-gray-800">请假申请</h1>
+                <p class="text-gray-500 mt-1">提交请假申请，等待审批</p>
+            </div>
+            <div class="mt-4 md:mt-0 flex space-x-3">
+                <button class="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition-custom flex items-center">
+                    <i class="fa fa-download mr-2"></i>导出
+                </button>
+                <button class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 transition-custom flex items-center">
+                    <i class="fa fa-plus mr-2"></i>新建申请
+                </button>
+            </div>
+        </div>
+        
+        <!-- 请假申请表单卡片 -->
+        <div class="bg-white rounded-xl shadow-card p-6 mb-6">
+            <h2 class="text-lg font-semibold mb-5">请假申请表</h2>
+            
+            <form id="leaveForm">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <!-- 左侧表单 -->
+                    <div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">申请人</label>
+                            <div class="flex items-center">
+                                <img src="https://picsum.photos/id/64/200/200" alt="申请人头像" class="w-8 h-8 rounded-full object-cover mr-3">
+                                <span class="font-medium">王小明</span>
+                                <span class="ml-2 text-xs text-gray-500">EMP001</span>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">部门</label>
+                            <div class="relative">
+                                <select class="w-full pl-3 pr-10 py-2 text-base border-gray-300 rounded-lg form-focus appearance-none">
+                                    <option value="1">技术部</option>
+                                    <option value="2">市场部</option>
+                                    <option value="3">人力资源部</option>
+                                    <option value="4">财务部</option>
+                                    <option value="5">销售部</option>
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500">
+                                    <i class="fa fa-chevron-down text-xs"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">请假类型</label>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div class="relative">
+                                    <input type="radio" id="type1" name="leaveType" class="hidden peer" checked>
+                                    <label for="type1" class="flex items-center justify-between p-3 border border-gray-300 rounded-lg cursor-pointer peer-checked:border-primary peer-checked:bg-primary/5 transition-custom">
+                                        <div>
+                                            <div class="font-medium">年假</div>
+                                            <div class="text-xs text-gray-500">剩余12天</div>
+                                        </div>
+                                        <div class="w-5 h-5 rounded-full border border-gray-300 peer-checked:border-primary peer-checked:bg-primary flex items-center justify-center">
+                                            <div class="w-2 h-2 rounded-full bg-white scale-0 peer-checked:scale-100 transition-transform"></div>
+                                        </div>
+                                    </label>
+                                </div>
+                                
+                                <div class="relative">
+                                    <input type="radio" id="type2" name="leaveType" class="hidden peer">
+                                    <label for="type2" class="flex items-center justify-between p-3 border border-gray-300 rounded-lg cursor-pointer peer-checked:border-primary peer-checked:bg-primary/5 transition-custom">
+                                        <div>
+                                            <div class="font-medium">病假</div>
+                                            <div class="text-xs text-gray-500">剩余15天</div>
+                                        </div>
+                                        <div class="w-5 h-5 rounded-full border border-gray-300 peer-checked:border-primary peer-checked:bg-primary flex items-center justify-center">
+                                            <div class="w-2 h-2 rounded-full bg-white scale-0 peer-checked:scale-100 transition-transform"></div>
+                                        </div>
+                                    </label>
+                                </div>
+                                
+                                <div class="relative">
+                                    <input type="radio" id="type3" name="leaveType" class="hidden peer">
+                                    <label for="type3" class="flex items-center justify-between p-3 border border-gray-300 rounded-lg cursor-pointer peer-checked:border-primary peer-checked:bg-primary/5 transition-custom">
+                                        <div>
+                                            <div class="font-medium">事假</div>
+                                            <div class="text-xs text-gray-500">无限制</div>
+                                        </div>
+                                        <div class="w-5 h-5 rounded-full border border-gray-300 peer-checked:border-primary peer-checked:bg-primary flex items-center justify-center">
+                                            <div class="w-2 h-2 rounded-full bg-white scale-0 peer-checked:scale-100 transition-transform"></div>
+                                        </div>
+                                    </label>
+                                </div>
+                                
+                                <div class="relative">
+                                    <input type="radio" id="type4" name="leaveType" class="hidden peer">
+                                    <label for="type4" class="flex items-center justify-between p-3 border border-gray-300 rounded-lg cursor-pointer peer-checked:border-primary peer-checked:bg-primary/5 transition-custom">
+                                        <div>
+                                            <div class="font-medium">其他</div>
+                                            <div class="text-xs text-gray-500">请备注说明</div>
+                                        </div>
+                                        <div class="w-5 h-5 rounded-full border border-gray-300 peer-checked:border-primary peer-checked:bg-primary flex items-center justify-center">
+                                            <div class="w-2 h-2 rounded-full bg-white scale-0 peer-checked:scale-100 transition-transform"></div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">请假天数</label>
+                            <div class="flex items-center">
+                                <button type="button" class="p-2 border border-gray-300 rounded-l-lg hover:bg-gray-50 transition-custom" id="decreaseDays">
+                                    <i class="fa fa-minus"></i>
+                                </button>
+                                <input type="number" id="days" value="3" min="0.5" max="30" step="0.5" class="w-16 text-center border-t border-b border-gray-300 py-2 form-focus">
+                                <button type="button" class="p-2 border border-gray-300 rounded-r-lg hover:bg-gray-50 transition-custom" id="increaseDays">
+                                    <i class="fa fa-plus"></i>
+                                </button>
+                                <span class="ml-2 text-gray-500">天</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 右侧表单 -->
+                    <div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">开始日期</label>
+                            <input type="date" id="startDate" class="w-full px-3 py-2 text-base border-gray-300 rounded-lg form-focus">
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">结束日期</label>
+                            <input type="date" id="endDate" class="w-full px-3 py-2 text-base border-gray-300 rounded-lg form-focus">
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">请假时间</label>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div class="relative">
+                                    <input type="radio" id="time1" name="leaveTime" class="hidden peer" checked>
+                                    <label for="time1" class="flex items-center justify-center p-3 border border-gray-300 rounded-lg cursor-pointer peer-checked:border-primary peer-checked:bg-primary/5 transition-custom">
+                                        <span>全天</span>
+                                    </label>
+                                </div>
+                                
+                                <div class="relative">
+                                    <input type="radio" id="time2" name="leaveTime" class="hidden peer">
+                                    <label for="time2" class="flex items-center justify-center p-3 border border-gray-300 rounded-lg cursor-pointer peer-checked:border-primary peer-checked:bg-primary/5 transition-custom">
+                                        <span>上午</span>
+                                    </label>
+                                </div>
+                                
+                                <div class="relative">
+                                    <input type="radio" id="time3" name="leaveTime" class="hidden peer">
+                                    <label for="time3" class="flex items-center justify-center p-3 border border-gray-300 rounded-lg cursor-pointer peer-checked:border-primary peer-checked:bg-primary/5 transition-custom">
+                                        <span>下午</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">直属上级</label>
+                            <div class="relative">
+                                <select class="w-full pl-3 pr-10 py-2 text-base border-gray-300 rounded-lg form-focus appearance-none">
+                                    <option value="1">张大山 (人力资源部)</option>
+                                    <option value="2">李主管 (技术部)</option>
+                                    <option value="3">王经理 (市场部)</option>
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500">
+                                    <i class="fa fa-chevron-down text-xs"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">请假原因</label>
+                    <textarea rows="4" class="w-full px-3 py-2 text-base border-gray-300 rounded-lg form-focus" placeholder="请详细描述请假原因"></textarea>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">附件 (选填)</label>
+                    <div class="flex items-center justify-center w-full">
+                        <label for="file-upload" class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-custom">
+                            <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                <i class="fa fa-cloud-upload text-2xl text-gray-400 mb-2"></i>
+                                <p class="mb-2 text-sm text-gray-500"><span class="font-medium">点击上传附件</span> 或拖放文件</p>
+                                <p class="text-xs text-gray-400">支持 PDF, DOCX, JPG 或 PNG (最大 10MB)</p>
+                            </div>
+                            <input id="file-upload" type="file" class="hidden" />
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end space-x-3 mt-6">
+                    <button type="button" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-custom">
+                        保存草稿
+                    </button>
+                    <button type="submit" class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-custom flex items-center">
+                        <i class="fa fa-paper-plane mr-2"></i>提交申请
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- 请假记录表格 -->
+        <div class="bg-white rounded-xl shadow-card overflow-hidden">
+            <div class="flex items-center justify-between p-5 border-b border-gray-100">
+                <h2 class="text-lg font-semibold">我的请假记录</h2>
+                <div class="flex space-x-2">
+                    <button class="px-3 py-1 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-custom">
+                        <i class="fa fa-filter mr-1"></i> 筛选
+                    </button>
+                    <button class="px-3 py-1 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-custom">
+                        <i class="fa fa-refresh mr-1"></i> 刷新
+                    </button>
+                </div>
+            </div>
+            
+            <!-- 表格 -->
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">申请编号</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">请假类型</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">开始日期</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">结束日期</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">天数</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">状态</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">审批人</th>
+                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <tr class="hover:bg-gray-50 transition-custom">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">REQ20250618001</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">年假</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">2025-06-20</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">2025-06-22</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">3天</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-success/10 text-success">
+                                    已批准
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">张大山</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <a href="#" class="text-primary hover:text-primary/80 transition-custom">查看详情</a>
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-gray-50 transition-custom">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">REQ20250615002</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">病假</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">2025-06-16</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">2025-06-16</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">1天</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-success/10 text-success">
+                                    已批准
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">张大山</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <a href="#" class="text-primary hover:text-primary/80 transition-custom">查看详情</a>
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-gray-50 transition-custom">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">REQ20250610003</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">事假</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">2025-06-12</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">2025-06-12</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">0.5天</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-danger/10 text-danger">
+                                    已拒绝
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">张大山</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <a href="#" class="text-primary hover:text-primary/80 transition-custom">查看详情</a>
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-gray-50 transition-custom">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">REQ20250605004</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">年假</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">2025-06-08</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">2025-06-10</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">3天</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-warning/10 text-warning">
+                                    待审批
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">张大山</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <a href="#" class="text-primary hover:text-primary/80 transition-custom">查看详情</a>
+                                <span class="mx-2 text-gray-300">|</span>
+                                <a href="#" class="text-danger hover:text-danger/80 transition-custom">取消</a>
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-gray-50 transition-custom">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">REQ20250528005</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">年假</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">2025-06-01</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">2025-06-01</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">1天</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-success/10 text-success">
+                                    已批准
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">张大山</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <a href="#" class="text-primary hover:text-primary/80 transition-custom">查看详情</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- 分页 -->
+            <div class="px-5 py-3 flex items-center justify-between border-t border-gray-100">
+                <div class="text-sm text-gray-500">
+                    显示 <span class="font-medium">1</span> 到 <span class="font-medium">5</span> 条，共 <span class="font-medium">12</span> 条记录
+                </div>
+                <div class="flex space-x-1">
+                    <button class="px-3 py-1 rounded border border-gray-300 text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                        <i class="fa fa-angle-left"></i>
+                    </button>
+                    <button class="px-3 py-1 rounded border border-primary bg-primary text-white">1</button>
+                    <button class="px-3 py-1 rounded border border-gray-300 hover:bg-gray-50">2</button>
+                    <button class="px-3 py-1 rounded border border-gray-300 hover:bg-gray-50">3</button>
+                    <button class="px-3 py-1 rounded border border-gray-300 text-gray-500 hover:bg-gray-50">
+                        <i class="fa fa-angle-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-white border-t border-gray-200 mt-10">
+        <div class="container mx-auto px-4 py-6">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="text-center md:text-left mb-4 md:mb-0">
+                    <p class="text-sm text-gray-500">© 2025 智慧考勤系统. 保留所有权利.</p>
+                </div>
+                <div class="flex space-x-6">
+                    <a href="#" class="text-gray-500 hover:text-primary transition-custom">
+                        <i class="fa fa-question-circle"></i> 帮助中心
+                    </a>
+                    <a href="#" class="text-gray-500 hover:text-primary transition-custom">
+                        <i class="fa fa-file-text-o"></i> 使用条款
+                    </a>
+                    <a href="#" class="text-gray-500 hover:text-primary transition-custom">
+                        <i class="fa fa-shield"></i> 隐私政策
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 提示模态框 -->
+    <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden" id="notificationModal">
+        <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6 transform transition-all">
+            <div class="text-center">
+                <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-success/10 mb-4">
+                    <i class="fa fa-check text-2xl text-success"></i>
+                </div>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">申请提交成功</h3>
+                <p class="text-sm text-gray-500 mb-6">您的请假申请已成功提交，等待上级审批</p>
+                <button class="w-full bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 transition-custom" onclick="document.getElementById('notificationModal').classList.add('hidden')">
+                    确定
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 设置默认日期
+        document.addEventListener('DOMContentLoaded', function() {
+            // 设置今天的日期
+            const today = new Date();
+            const tomorrow = new Date(today);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            
+            // 格式化日期为 YYYY-MM-DD
+            function formatDate(date) {
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            }
+            
+            // 设置开始日期为今天
+            document.getElementById('startDate').value = formatDate(today);
+            
+            // 设置结束日期为明天
+            document.getElementById('endDate').value = formatDate(tomorrow);
+            
+            // 请假天数增减
+            document.getElementById('decreaseDays').addEventListener('click', function() {
+                const daysInput = document.getElementById('days');
+                const currentValue = parseFloat(daysInput.value);
+                if (currentValue > 0.5) {
+                    daysInput.value = (currentValue - 0.5).toFixed(1);
+                }
+            });
+            
+            document.getElementById('increaseDays').addEventListener('click', function() {
+                const daysInput = document.getElementById('days');
+                const currentValue = parseFloat(daysInput.value);
+                if (currentValue < 30) {
+                    daysInput.value = (currentValue + 0.5).toFixed(1);
+                }
+            });
+            
+            // 表单提交
+            document.getElementById('leaveForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                document.getElementById('notificationModal').classList.remove('hidden');
+            });
+            
+            // 打开新建申请模态框
+            document.querySelector('.bg-primary.text-white.px-4.py-2.rounded-lg').addEventListener('click', function() {
+                // 滚动到表单顶部
+                document.querySelector('main').scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+    </script>
+</body>
+</html>    

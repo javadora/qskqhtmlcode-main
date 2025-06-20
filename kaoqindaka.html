@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>员工考勤打卡</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+
+        .attendance-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .user-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: #ddd;
+            margin-right: 15px;
+            overflow: hidden;
+        }
+
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .attendance-status {
+            text-align: center;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-bottom: 5px;
+        }
+
+        .status-online {
+            background-color: #4CAF50;
+        }
+
+        .status-offline {
+            background-color: #f44336;
+        }
+
+        .attendance-actions {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 0 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #45a049;
+        }
+
+        .btn:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        .attendance-record {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table th, table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        table th {
+            background-color: #f2f2f2;
+        }
+
+        table tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .pagination button {
+            padding: 8px 12px;
+            margin: 0 5px;
+            border: 1px solid #ddd;
+            background-color: white;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+
+        .pagination button.active {
+            background-color: #4CAF50;
+            color: white;
+            border-color: #4CAF50;
+        }
+
+        .pagination button:hover:not(.active) {
+            background-color: #f5f5f5;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>员工考勤打卡</h1>
+    </header>
+    <div class="attendance-info">
+        <div class="user-info">
+            <div class="user-avatar">
+                <img src="https://via.placeholder.com/60" alt="用户头像">
+            </div>
+            <div>
+                <h3 id="username">黎想</h3>
+                <p id="department">研发部</p>
+                <p id="position">研发实习生</p>
+            </div>
+</div>
+    </div>
+    <div class="attendance-status">
+        <div>
+            <span class="status-indicator status-online"></span>
+            <span>已打卡</span>
+        </div>
+        <p>今日打卡时间：<span id="checkin-time">08:30</span></p>
+        <p>今日打卡状态：<span id="status-text">正常</span></p>
+    </div>
+</div>
+
+<div class="attendance-actions">
+    <button id="checkin-btn" class="btn">上班打卡</button>
+    <button id="checkout-btn" class="btn">下班打卡</button>
+</div>
+<div class="attendance-record">
+    <h2>考勤记录</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>日期</th>
+            <th>上班打卡时间</th>
+            <th>下班打卡时间</th>
+            <th>工作时长</th>
+            <th>状态</th>
+        </tr>
+        </thead>
+        <tbody id="attendance-table-body">
+        <tr>
+            <td>2025-06-20</td>
+            <td>08:30</td>
+            <td>18:00</td>
+            <td>8小时</td>
+            <td>正常</td>
+        </tr>
+        <tr>
+            <td>2025-06-21</td>
+            <td>08:30</td>
+            <td>12:00</td>
+            <td>2小时45分钟</td>
+            <td>迟到</td>
+        </tr>
+        <tr>
+            <td>2025-06-23</td>
+            <td>08:30</td>
+            <td>17:30</td>
+            <td>8小时30分钟</td>
+            <td>早退</td>
+        </tr>
+        <tr>
+            <td>2025-06-24</td>
+            <td>08:30</td>
+            <td>18:00</td>
+            <td>8小时</td>
+            <td>正常</td>
+        </tr>
+        <tr>
+            <td>2025-06-25</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>请假</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="pagination">
+    <button>&laquo;</button>
+    <button class="active">1</button>
+    <button>2</button>
+    <button>3</button>
+    <button>&raquo;</button>
+</div>
+
+<script>
+    // 获取当前时间
+    function getCurrentTime() {
+        const now = new Date();
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        return `${hours}:${minutes}`;
+    }
+
+    // 打卡功能
+    document.getElementById('checkin-btn').addEventListener('click', function() {
+        const currentTime = getCurrentTime();
+        document.getElementById('checkin-time').textContent = currentTime;
+        document.getElementById('checkin-btn').disabled = true;
+        document.getElementById('checkout-btn').disabled = false;
+        document.querySelector('.status-indicator').className = 'status-indicator status-online';
+        document.getElementById('status-text').textContent = '正常';
+        alert(`上班打卡成功！打卡时间：${currentTime}`);
+    });
+
+    document.getElementById('checkout-btn').addEventListener('click', function() {
+        const currentTime = getCurrentTime();
+        alert(`下班打卡成功！打卡时间：${currentTime}`);
+        document.getElementById('checkin-btn').disabled = false;
+        document.getElementById('checkout-btn').disabled = true;
+        document.querySelector('.status-indicator').className = 'status-indicator status-offline';
+        document.getElementById('status-text').textContent = '已下班';
+    });
+
+    // 分页功能
+    const paginationButtons = document.querySelectorAll('.pagination button');
+    paginationButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // 移除所有按钮的 active 类
+            paginationButtons.forEach(btn => btn.classList.remove('active'));
+            // 为当前点击的按钮添加 active 类
+            this.classList.add('active');
+            // 这里可以添加加载对应页数据的逻辑
+        });
+    });
+</script>
+</body>
+
+</html>
